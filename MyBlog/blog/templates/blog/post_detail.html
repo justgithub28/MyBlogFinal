@@ -1,0 +1,72 @@
+{%extends "blog/base.html" %}
+{% block content %}
+<div class="jumbotron">
+
+  <h1 class="posttitle loader">{{post.title}}</h1>
+
+  {% if post.published_date %}
+  <div class="date postdate">
+  {{post.published_date}}
+  </div>
+  {% endif%}
+
+  <div class="postdate">
+    {% if post.author.email %}
+    <a href="{%url 'blog:alluserpost' email=post.author.email %}"><b>{{post.author.email}}</b></a>
+    {% else %}
+    <p>Anonymous</p>
+    {% endif %}
+  </div>
+  <h6 class="postcontent">{{post.text|safe|linebreaksbr}}</h6>
+
+  {% if user.is_authenticated %}
+
+        {% if user.email == post.author.email %}
+        <a class="btn btn-primary btn-sm" href="{% url 'blog:post_edit' pk=post.pk %}">Edit Post</a>
+            {% if post.published_date is null %}
+                <a class="btn btn-primary btn-sm" href="{% url 'blog:post_publish' pk=post.pk %}">Publish Post</a>
+            {% else %}
+                <p>Published on: {{ post.published_date }}</p>
+            {% endif %}
+        <a class="btn btn-primary btn-sm" href="{% url 'blog:post_remove' pk=post.pk %}">Remove Post</a>
+        {% endif %}
+        <hr>
+        <a class="btn btn-primary btn-sm" href="{% url 'blog:add_comments_to_post' pk=post.pk %}">Add comments</a>
+        <div class="continer">
+
+        {% for comment in post.comments.all %}
+
+          <br>
+          <hr>
+            {% if comment.approved_comment %}
+
+            <p><b>{{comment.text|safe|linebreaksbr}}</b></p>
+            <p>Posted by: <a href="{% url 'blog:alluserpost' email=comment.author %}"> {{comment.author}} </a>on {{comment.created_date}}</p>
+            {% if user.email == comment.author or user.email == post.author.email %}
+              <a class="btn btn-primary btn-sm" href="{% url 'blog:comment_remove' pk=comment.pk %}">Remove Comment</a>
+            {% endif %}
+
+            {% else %}
+
+          <p><b>{{comment.text|safe|linebreaksbr}}</b></p>
+          <p>Posted by:<a href="{%url 'blog:alluserpost' email=comment.author %}">{{comment.author}} </a>on {{comment.created_date}} </p>
+          {% if user.email == post.author.email %}
+          <a class="btn btn-primary btn-sm" href="{% url 'blog:comment_approve' pk=comment.pk %}">Approve</a>
+          {% endif %}
+
+          {% if user.email == comment.author or user.email == post.author.email %}
+            <a class="btn btn-primary btn-sm" href="{% url 'blog:comment_remove' pk=comment.pk %}">Remove Comment</a>
+          {% endif %}
+
+            {%endif%}
+
+            {% empty %}
+            <p>No comments</p>
+          {% endfor %}
+
+        </div>
+  {% endif%}
+
+
+</div>
+{% endblock %}

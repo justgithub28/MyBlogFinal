@@ -1,0 +1,11 @@
+{%extends "blog/base.html" %}
+
+
+{% block content %}
+
+<div class="jumbotron">
+  <h1>Hello welcome to MyBlog!</h1>
+  <h1><a href="{% url 'accounts:signup' %}">Please Register!!</a></h1>
+</div>
+
+{% endblock %}
